@@ -10,7 +10,7 @@ SELECT
     edad,
     estado,
     ciudad,
-    --telefono,
+    telefono,
     cp,
     case when empresa is null then lower(empresa_laboras)
         else  lower(empresa) end as empresa,
