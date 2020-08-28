@@ -1,4 +1,4 @@
-DROP VIEW dwh.fact_symptoms;
+---DROP VIEW dwh.fact_symptoms;
 
 CREATE OR REPLACE VIEW dwh.fact_symptoms AS
 SELECT ml.timestamp::timestamp as timestamp,
