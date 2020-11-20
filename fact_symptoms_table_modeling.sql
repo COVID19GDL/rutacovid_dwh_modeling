@@ -2,16 +2,12 @@
 
 CREATE OR REPLACE VIEW dwh.fact_symptoms AS
 SELECT ml.timestamp::timestamp as timestamp,
-       case
-           when ml.empresa is null then lower(ml.empresa_laboras)
-           else lower(ml.empresa) end                                             as empresa,
-       ml.estado,
-       ml.ciudad,
-       case
-           when ml.email_registro is null then lower(ml.correo_electronico)
-           else lower(ml.email_registro) end                                      as correo_electronico,
-       ml.edad,
-       ml.nombre,
+       u.empresa                                            as empresa,
+       u.estado,
+       u.ciudad,
+       u.correo_electronico                                     as correo_electronico,
+       u.edad,
+       u.nombre,
        ml.puntaje                                                                 as puntaje_riesgo,
        ml.tomado_para_fiebre,
        ml.tomado_para_tos,
@@ -22,7 +18,7 @@ SELECT ml.timestamp::timestamp as timestamp,
        ml.tiempo,
        ml.enviar                                                                  as correo_enviado,
        ml.dias_con_diarrea,
-       ml.cp,
+       u.codigo_postal,
        ml.doctor_email,
        CASE WHEN ml.tenido_covid = 'Sí' then TRUE END                             as tenido_covid,
        CASE WHEN te_realizaron_prueba = 'Sí' then TRUE end                        as prueba_covid_realizada,
@@ -60,4 +56,7 @@ SELECT ml.timestamp::timestamp as timestamp,
        CASE WHEN ml.hipertension = 'Sí' then TRUE END                             as hipertension,
        CASE WHEN ml.cuesta_trabajo_respirar = 'Sí' then TRUE END                  as cuesta_trabajo_respirar,
        CASE WHEN ml.cancer = 'Sí' then TRUE END                                   as cancer
-FROM public.monitoreo_laboral as ml;
+FROM public.monitoreo_laboral as ml
+inner join dwh.dim_user u on u.correo_electronico = (case
+           when ml.email_registro is null then lower(ml.correo_electronico)
+           else lower(ml.email_registro) end);
