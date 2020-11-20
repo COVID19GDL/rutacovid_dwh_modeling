@@ -1,30 +1,19 @@
---DROP view dwh.dim_user;
-​
+--DROP view dwh.dim_user CASCADE;
+
 CREATE OR REPLACE VIEW dwh.dim_user AS
 
     with user_data as (
-    select
-    *
-    from (
     SELECT
-    timestamp::timestamp as created_at,
-    CASE WHEN email_registro is null then lower(correo_electronico)
-        else lower(email_registro) end as correo_electronico,
+    fecha_de_inicio::timestamp as created_at,
+    email as correo_electronico,
     nombre,
-    edad,
     estado,
     ciudad,
-    --telefono,
-    cp,
-    case when empresa is null then lower(empresa_laboras)
-        else  lower(empresa) end as empresa,
-    case when departamento_de_trabajo is null then lower(departamento_de_trabajo_nousar)
-        else lower(departamento_de_trabajo) end as departamento_de_trabajo,
-    row_number() over (partition by correo_electronico order by timestamp desc) as row_num
-    FROM monitoreo_laboral as ml
-    where completado_cuestionario_previamente = 'No'
-        ) as ordered_registration
-    where row_num = 1
+    telefono,
+    codigo_postal,
+    empresa,
+    area_departamento_de_trabajo as departamento_de_trabajo
+    FROM catalogousuarios as ml
     ),
 
 work_status as (
@@ -34,6 +23,7 @@ work_status as (
         else lower(email_registro) end as correo_electronico,
     trabajo_casa_o_presencial as forma_de_trabajo,
     duracion_jornada_laboral,
+    edad,
     personas_contacto_cada_dia as personas_contacto_diario,
     tipo_espacio_trabajas as tipo_espacio_trabajo,
     distancia_cowork_mas_cercano as distancia_entre_empleados,
@@ -72,8 +62,8 @@ nombre,
     edad,
     estado,
     ciudad,
-    --telefono,
-    cp,
+    telefono,
+    codigo_postal,
     empresa,
     departamento_de_trabajo,
     timestamp as last_response_at,
