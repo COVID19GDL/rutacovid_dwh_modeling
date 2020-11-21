@@ -35,4 +35,6 @@ SELECT
 FROM monitoreo_laboral as ml
 inner join dwh.dim_user u on u.correo_electronico = (case
            when ml.email_registro is null then lower(ml.correo_electronico)
-           else lower(ml.email_registro) end);
+           else lower(ml.email_registro) end)
+where completado_cuestionario_previamente = 'No'
+or cambio_condiciones_laborales = 'Sí';

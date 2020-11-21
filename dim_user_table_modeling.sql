@@ -45,6 +45,16 @@ FROM monitoreo_laboral as ml
 where completado_cuestionario_previamente = 'No'
 or cambio_condiciones_laborales = 'Sí') ,
 
+
+last_response_at as (
+select
+    CASE WHEN email_registro is null then lower(correo_electronico)
+    else lower(email_registro) end as correo_electronico,
+    max(timestamp) as last_response_at
+    FROM monitoreo_laboral as ml
+    group by 1
+    ),
+
 last_work_status as (
     select *
     from (
@@ -66,7 +76,8 @@ nombre,
     codigo_postal,
     empresa,
     departamento_de_trabajo,
-    timestamp as last_response_at,
+    timestamp as last_work_status_response_at,
+    last_response_at,
     forma_de_trabajo,
     duracion_jornada_laboral,
     personas_contacto_diario,
@@ -87,4 +98,5 @@ nombre,
     no_trabajo_presencial,
     razon_no_trabajo_presencial
 from user_data
-inner join last_work_status on last_work_status.correo_electronico = user_data.correo_electronico;
+inner join last_work_status on last_work_status.correo_electronico = user_data.correo_electronico
+inner join last_response_at on last_response_at.correo_electronico = user_data.correo_electronico;
